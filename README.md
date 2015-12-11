@@ -2,6 +2,8 @@
 
 3D layout component and helpers for A-Frame VR.
 
+This is a work in progress.
+
 ### Usage
 
 Install.

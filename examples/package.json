@@ -1,0 +1,14 @@
+{
+  "name": "aframe-layout-example",
+  "version": "1.0.0",
+  "description": "A-Frame layout component example.",
+  "devDependencies": {
+    "@mozvr/aframe-core": "*",
+    "browserify": "^12.0.1"
+  },
+  "scripts": {
+    "build": "browserify index.js -o build.js"
+  },
+  "author": "Kevin Ngo <me@ngokevin.com>",
+  "license": "MIT"
+}

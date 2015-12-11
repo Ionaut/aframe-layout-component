@@ -15,12 +15,16 @@ module.exports = {
 
   init: function () {
     var self = this;
+    var el = self.el;
     self.initialPositions = [];
 
     // Store positions in case we have to reset later.
-    self.el.children.forEach(function (childEl) {
-      initialPositions.push(childEl.getAttribute('position'));
-    });
+    for (var i = 0; i < el.children.length; i++) {
+      var childEl = el.children[i];
+      if (childEl.tagName === 'A-ENTITY') {
+        self.initialPositions.push(childEl.getComputedAttribute('position'));
+      }
+    }
   },
 
   /**
@@ -29,7 +33,7 @@ module.exports = {
   update: function (oldData) {
     var data = this.data;
 
-    switch (type) {
+    switch (data.type) {
       case 'circle': {
         this._layoutCircle();
       }
@@ -48,17 +52,26 @@ module.exports = {
 
   _layoutCircle: function () {
     var el = this.el;
-    var numChildren = this.el.querySelectorAll(':scope > a-entity').length;
+    var children = el.children;
+    var entityChildren = [];
     var radius = this.data.margin;
 
-    el.children.forEach(function (childEl, i) {
-      var rad = 2 * Math.PI / i;
+    for (var i = 0; i < children.length; i++) {
+      var child = children[i];
+      if (child.tagName === 'A-ENTITY') {
+        entityChildren.push(child);
+      }
+    }
+
+    for (var i = 0; i < entityChildren.length; i++) {
+      var childEl = entityChildren[i];
+      var rad = i * (2 * Math.PI) / entityChildren.length;
       childEl.setAttribute('position', {
         x: radius * Math.cos(rad),
-        y: el.getAttribute('position').y,
-        z: radius * Math.sin(rad),
+        y: el.getComputedAttribute('position').y,
+        z: radius * Math.sin(rad)
       });
-    });
+    }
   },
 
   /**
