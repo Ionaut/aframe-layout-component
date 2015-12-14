@@ -1,7 +1,7 @@
 /**
  Layout component for A-Frame.
 */
-module.exports = {
+module.exports.component = {
   schema: {
     type: {
       default: 'line',
@@ -13,76 +13,99 @@ module.exports = {
     }
   },
 
+  /**
+   * Store initial positions in case need to reset on component removal.
+   */
   init: function () {
     var self = this;
     var el = self.el;
+    self.children = el.getChildEntities();
     self.initialPositions = [];
 
-    // Store positions in case we have to reset later.
-    el.getChildEntities().forEach(function (childEl) {
+    self.children.forEach(function (childEl) {
       self.initialPositions.push(childEl.getComputedAttribute('position'));
     });
   },
 
   /**
-   * TODO: Handle updates.
+   * Update child entity positions.
    */
   update: function (oldData) {
+    var children = this.children;
     var data = this.data;
+    var el = this.el;
+    var numChildren = children.length;
+    var positionFn;
+    var positions;
+    var startPosition = el.getComputedAttribute('position');
 
     switch (data.type) {
       case 'circle': {
-        this._layoutCircle();
+        positionFn = getCirclePositions;
         break;
       }
       default: {
-        this._layoutLine();
+        positionFn = getLinePositions;
       }
     }
+
+    positions = positionFn(data, numChildren, startPosition);
+    setPositions(children, positions);
   },
 
   /**
-   * TODO: Reset positions on remove.
+   * Reset positions.
    */
   remove: function () {
-
-  },
-
-  _layoutCircle: function () {
-    var el = this.el;
-    var radius = this.data.margin;
-
-    el.getChildEntities().forEach(function (childEl) {
-      var rad = i * (2 * Math.PI) / entityChildren.length;
-      childEl.setAttribute('position', {
-        x: radius * Math.cos(rad),
-        y: el.getComputedAttribute('position').y,
-        z: radius * Math.sin(rad)
-      });
-    });
-  },
-
-  _layoutLine: function () {
-    var el = this.el;
-    var elPos = el.getComputedAttribute('position');
-    var current = 0;
-    var margin = this.data.margin;
-
-    el.getChildEntities().forEach(function (childEl) {
-      current += margin;
-      childEl.setAttribute('position', {
-        x: current,
-        y: 0,
-        z: 0
-      });
-    });
-  },
-
-  parse: function (value) {
-
-  },
-
-  stringify: function (value) {
-
+    setPositions(children, this.initialPositions);
   }
 };
+
+/**
+ * Get positions for `circle` layout.
+ * TODO: arcLength.
+ */
+function getCirclePositions (data, numChildren, startPosition) {
+  var positions = [];
+
+  for (var i = 0; i < numChildren; i++) {
+    var rad = i * (2 * Math.PI) / numChildren;
+    positions.push({
+      x: startPosition.x + data.margin * Math.cos(rad),
+      y: startPosition.y,
+      z: startPosition.z + data.margin * Math.sin(rad)
+    });
+  }
+  return positions;
+}
+module.exports.getCirclePositions = getCirclePositions;
+
+/**
+ * Get positions for `line` layout.
+ * TODO: 3D margins.
+ */
+function getLinePositions (data, numChildren, startPosition) {
+  var positions = [];
+
+  for (var i = 0; i < numChildren; i++) {
+    positions.push({
+      x: startPosition.x + data.margin * i,
+      y: startPosition.y,
+      z: startPosition.z
+    });
+  }
+  return positions;
+}
+module.exports.getLinePositions = getLinePositions;
+
+/**
+ * Set position on child entities.
+ *
+ * @param {array} els - Child entities to set.
+ * @param {array} positions - Array of coordinates.
+ */
+function setPositions (els, positions) {
+  els.forEach(function (el, i) {
+    el.setAttribute('position', positions[i]);
+  });
+}
