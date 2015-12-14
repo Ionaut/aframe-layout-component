@@ -19,12 +19,9 @@ module.exports = {
     self.initialPositions = [];
 
     // Store positions in case we have to reset later.
-    for (var i = 0; i < el.children.length; i++) {
-      var childEl = el.children[i];
-      if (childEl.tagName === 'A-ENTITY') {
-        self.initialPositions.push(childEl.getComputedAttribute('position'));
-      }
-    }
+    el.getChildEntities().forEach(function (childEl) {
+      self.initialPositions.push(childEl.getComputedAttribute('position'));
+    });
   },
 
   /**
@@ -36,6 +33,7 @@ module.exports = {
     switch (data.type) {
       case 'circle': {
         this._layoutCircle();
+        break;
       }
       default: {
         this._layoutLine();
@@ -52,31 +50,39 @@ module.exports = {
 
   _layoutCircle: function () {
     var el = this.el;
-    var children = el.children;
-    var entityChildren = [];
     var radius = this.data.margin;
 
-    for (var i = 0; i < children.length; i++) {
-      var child = children[i];
-      if (child.tagName === 'A-ENTITY') {
-        entityChildren.push(child);
-      }
-    }
-
-    for (var i = 0; i < entityChildren.length; i++) {
-      var childEl = entityChildren[i];
+    el.getChildEntities().forEach(function (childEl) {
       var rad = i * (2 * Math.PI) / entityChildren.length;
       childEl.setAttribute('position', {
         x: radius * Math.cos(rad),
         y: el.getComputedAttribute('position').y,
         z: radius * Math.sin(rad)
       });
-    }
+    });
   },
 
-  /**
-   * TODO: Line layout.
-   */
   _layoutLine: function () {
+    var el = this.el;
+    var elPos = el.getComputedAttribute('position');
+    var current = 0;
+    var margin = this.data.margin;
+
+    el.getChildEntities().forEach(function (childEl) {
+      current += margin;
+      childEl.setAttribute('position', {
+        x: current,
+        y: 0,
+        z: 0
+      });
+    });
+  },
+
+  parse: function (value) {
+
+  },
+
+  stringify: function (value) {
+
   }
 };
