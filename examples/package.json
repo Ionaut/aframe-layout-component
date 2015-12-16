@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A-Frame layout component example.",
   "devDependencies": {
-    "@mozvr/aframe-core": "*",
+    "aframe-core": "*",
     "browserify": "^12.0.1"
   },
   "scripts": {
