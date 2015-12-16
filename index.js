@@ -1,6 +1,6 @@
 /**
- Layout component for A-Frame.
-*/
+ * Layout component for A-Frame.
+ */
 module.exports.component = {
   schema: {
     type: {

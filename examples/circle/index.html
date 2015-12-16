@@ -4,8 +4,9 @@
   </head>
   <body>
     <a-assets>
-      <a-mixin id="cube" geometry="primitive: box"
-               material="color: #FFFBE0"></a-mixin>
+      <a-mixin id="cube" geometry="primitive: box; depth: 1; height: 1; width: 1"
+               material="color: #FFFBE0">
+      </a-mixin>
       <a-mixin id="secondary" material="color: #FFB400"></a-mixin>
     </a-assets>
     <a-scene>
@@ -13,7 +14,7 @@
                 material="color: #2994B2; shader: flat" scale="1 1 -1">
       </a-entity>
 
-      <a-entity layout="type: circle; margin: 10">
+      <a-entity layout="type: circle; margin: 5" position="0 0 -5">
         <a-animation attribute="rotation" dur="5000" easing="linear"
                      repeat="indefinite" to="0 360 360">
         </a-animation>
@@ -27,7 +28,7 @@
         <a-entity mixin="cube"></a-entity>
       </a-entity>
 
-      <a-entity layout="type: circle; margin: 20">
+      <a-entity layout="type: circle; margin: 6" position="0 0 -5">
         <a-animation attribute="rotation" dur="5000" easing="linear"
                      repeat="indefinite" to="360 0 360">
         </a-animation>
