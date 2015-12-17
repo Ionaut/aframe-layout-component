@@ -3,14 +3,10 @@
  */
 module.exports.component = {
   schema: {
-    type: {
-      default: 'line',
-      oneOf: ['circle', 'line']
-    },
-    margin: {
-      default: 1,
-      min: 0
-    }
+    columns: { default: 1, min: 0, if: { type: ['box'] } },
+    margin: { default: 1, min: 0, if: { type: ['box', 'line'] } },
+    radius: { default: 1, min: 0, if: { type: ['circle'] } },
+    type: { default: 'line', if: ['box', 'circle', 'line'] }
   },
 
   /**
@@ -40,6 +36,10 @@ module.exports.component = {
     var startPosition = el.getComputedAttribute('position');
 
     switch (data.type) {
+      case 'box': {
+        positionFn = getBoxPositions;
+        break;
+      }
       case 'circle': {
         positionFn = getCirclePositions;
         break;
@@ -62,6 +62,27 @@ module.exports.component = {
 };
 
 /**
+ * Get positions for `box` layout.
+ */
+function getBoxPositions (data, numChildren, startPosition) {
+  var positions = [];
+  var rows = Math.ceil(numChildren / data.columns);
+
+  for (var row = 0; row < rows; row++) {
+    for (var column = 0; column < data.columns; column++) {
+      positions.push({
+        x: column * data.margin,
+        y: row * data.margin,
+        z: 0
+      });
+    }
+  }
+
+  return positions;
+}
+module.exports.getBoxPositions = getBoxPositions;
+
+/**
  * Get positions for `circle` layout.
  * TODO: arcLength.
  */
@@ -71,9 +92,9 @@ function getCirclePositions (data, numChildren, startPosition) {
   for (var i = 0; i < numChildren; i++) {
     var rad = i * (2 * Math.PI) / numChildren;
     positions.push({
-      x: startPosition.x + data.margin * Math.cos(rad),
+      x: startPosition.x + data.radius * Math.cos(rad),
       y: startPosition.y,
-      z: startPosition.z + data.margin * Math.sin(rad)
+      z: startPosition.z + data.radius * Math.sin(rad)
     });
   }
   return positions;
@@ -85,16 +106,8 @@ module.exports.getCirclePositions = getCirclePositions;
  * TODO: 3D margins.
  */
 function getLinePositions (data, numChildren, startPosition) {
-  var positions = [];
-
-  for (var i = 0; i < numChildren; i++) {
-    positions.push({
-      x: startPosition.x + data.margin * i,
-      y: startPosition.y,
-      z: startPosition.z
-    });
-  }
-  return positions;
+  data.columns = numChildren;
+  return getBoxPositions(data, numChildren, startPosition);
 }
 module.exports.getLinePositions = getLinePositions;
 
