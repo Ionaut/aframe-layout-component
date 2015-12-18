@@ -1,4 +1,4 @@
-## aframe-layout
+## aframe-layout-component
 
 3D layout component and helpers for A-Frame VR.
 
