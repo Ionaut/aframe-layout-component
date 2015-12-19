@@ -22,8 +22,7 @@ module.exports = function (config) {
     files: [
       'tests/**/*.test.js',
     ],
-    frameworks: ['mocha', 'sinon-chai', 'chai-shallow-deep-equal',
-                 'browserify'],
+    frameworks: ['mocha', 'sinon-chai', 'chai-shallow-deep-equal', 'browserify'],
     preprocessors: {
       'tests/**/*.js': ['browserify']
     },
