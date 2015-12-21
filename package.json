@@ -4,14 +4,20 @@
   "description": "3D layout component and helpers for A-Frame VR.",
   "main": "index.js",
   "scripts": {
+    "build": "browserify examples/main.js -o examples/build.js",
+    "dev": "watchify examples/main.js -o examples/build.js",
+    "preghpages": "npm run build && rm -rf gh-pages && cp -r examples gh-pages",
+    "ghpages": "npm run preghpages && ghpages -p gh-pages",
+    "gh-pages": "npm run ghpages",
     "test": "karma start ./tests/karma.conf.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ngokevin/aframe-layout.git"
+    "url": "git+https://github.com/ngokevin/aframe-layout-component.git"
   },
   "keywords": [
     "aframe",
+    "aframe-component",
     "layout",
     "aframe-vr",
     "vr",
@@ -22,14 +28,16 @@
   "author": "Kevin Ngo <me@ngokevin.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ngokevin/aframe-layout/issues"
+    "url": "https://github.com/ngokevin/aframe-layout-component/issues"
   },
-  "homepage": "https://github.com/ngokevin/aframe-layout#readme",
+  "homepage": "https://github.com/ngokevin/aframe-layout-component#readme",
   "devDependencies": {
-    "aframe-core": "^0.1.3",
+    "aframe-core": "*",
+    "browserify": "^12.0.1",
     "browserify-css": "^0.8.3",
     "chai": "^3.4.1",
     "chai-shallow-deep-equal": "^1.3.0",
+    "ghpages": "0.0.3",
     "karma": "^0.13.15",
     "karma-browserify": "^4.4.2",
     "karma-chai-shallow-deep-equal": "0.0.4",
@@ -37,6 +45,7 @@
     "karma-mocha": "^0.2.1",
     "karma-mocha-reporter": "^1.1.3",
     "karma-sinon-chai": "^1.1.0",
-    "mocha": "^2.3.4"
+    "mocha": "^2.3.4",
+    "watchify": "^3.6.1"
   }
 }
