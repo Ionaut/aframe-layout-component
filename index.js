@@ -1,12 +1,13 @@
 /**
  * Layout component for A-Frame.
+ * http://www.vb-helper.com/tutorial_platonic_solids.html
  */
 module.exports.component = {
   schema: {
     columns: { default: 1, min: 0, if: { type: ['box'] } },
     margin: { default: 1, min: 0, if: { type: ['box', 'line'] } },
-    radius: { default: 1, min: 0, if: { type: ['circle'] } },
-    type: { default: 'line', if: ['box', 'circle', 'line'] }
+    radius: { default: 1, min: 0, if: { type: ['circle', 'cube', 'pyramid'] } },
+    type: { default: 'line', oneOf: ['box', 'circle', 'cube', 'line', 'pyramid'] }
   },
 
   /**
@@ -35,6 +36,7 @@ module.exports.component = {
     var positions;
     var startPosition = el.getComputedAttribute('position');
 
+    // Calculate different positions based on layout shape.
     switch (data.type) {
       case 'box': {
         positionFn = getBoxPositions;
@@ -44,7 +46,16 @@ module.exports.component = {
         positionFn = getCirclePositions;
         break;
       }
+      case 'cube': {
+        positionFn = getCubePositions;
+        break;
+      }
+      case 'pyramid': {
+        positionFn = getPyramidPositions;
+        break;
+      }
       default: {
+        // Line.
         positionFn = getLinePositions;
       }
     }
@@ -70,11 +81,11 @@ function getBoxPositions (data, numChildren, startPosition) {
 
   for (var row = 0; row < rows; row++) {
     for (var column = 0; column < data.columns; column++) {
-      positions.push({
-        x: column * data.margin,
-        y: row * data.margin,
-        z: 0
-      });
+      positions.push([
+        column * data.margin,
+        row * data.margin,
+        0
+      ]);
     }
   }
 
@@ -91,11 +102,11 @@ function getCirclePositions (data, numChildren, startPosition) {
 
   for (var i = 0; i < numChildren; i++) {
     var rad = i * (2 * Math.PI) / numChildren;
-    positions.push({
-      x: startPosition.x + data.radius * Math.cos(rad),
-      y: startPosition.y,
-      z: startPosition.z + data.radius * Math.sin(rad)
-    });
+    positions.push([
+      startPosition.x + data.radius * Math.cos(rad),
+      startPosition.y,
+      startPosition.z + data.radius * Math.sin(rad)
+    ]);
   }
   return positions;
 }
@@ -112,6 +123,53 @@ function getLinePositions (data, numChildren, startPosition) {
 module.exports.getLinePositions = getLinePositions;
 
 /**
+ * Get positions for `cube` layout.
+ */
+function getCubePositions (data, numChildren, startPosition) {
+  return transform([
+    [1, 0, 0],
+    [0, 1, 0],
+    [0, 0, 1],
+    [-1, 0, 0],
+    [0, -1, 0],
+    [0, 0, -1],
+  ], startPosition, data.radius / 2);
+}
+module.exports.getCubePositions = getCubePositions;
+
+/**
+ * Get positions for `pyramid` layout.
+ */
+function getPyramidPositions (data, numChildren, startPosition) {
+  var SQRT_3 = Math.sqrt(3);
+  var NEG_SQRT_1_3 = -1 / Math.sqrt(3);
+  var DBL_SQRT_2_3 = 2 * Math.sqrt(2 / 3);
+
+  return transform([
+    [0, 0, SQRT_3 + NEG_SQRT_1_3],
+    [-1, 0, NEG_SQRT_1_3],
+    [1, 0, NEG_SQRT_1_3],
+    [0, DBL_SQRT_2_3, 0]
+  ], startPosition, data.radius / 2);
+}
+module.exports.getPyramidPositions = getPyramidPositions;
+
+/**
+ * Multiply all coordinates by a scale factor and add translate.
+ *
+ * @params {array} positions - Array of coordinates in array form.
+ * @returns {array} positions
+ */
+function transform (positions, translate, scale) {
+  translate = [translate.x, translate.y, translate.z];
+  return positions.map(function (position) {
+    return position.map(function (point, i) {
+      return point * scale + translate[i];
+    });
+  });
+};
+
+/**
  * Set position on child entities.
  *
  * @param {array} els - Child entities to set.
@@ -119,6 +177,11 @@ module.exports.getLinePositions = getLinePositions;
  */
 function setPositions (els, positions) {
   els.forEach(function (el, i) {
-    el.setAttribute('position', positions[i]);
+    var position = positions[i];
+    el.setAttribute('position', {
+      x: position[0],
+      y: position[1],
+      z: position[2]
+    });
   });
 }
