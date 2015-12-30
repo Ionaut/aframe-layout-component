@@ -5,7 +5,6 @@
 module.exports.component = {
   schema: {
     columns: {default: 1, min: 0, if: {type: ['box']}},
-    lookAt: {default: '[camera]', if: {type: ['cube', 'dodecahedron', 'pyramid']}},
     margin: {default: 1, min: 0, if: { type: ['box', 'line']}},
     radius: {default: 1, min: 0, if: {
       type: ['circle', 'cube', 'dodecahedron', 'pyramid']
@@ -36,7 +35,6 @@ module.exports.component = {
     var children = this.children;
     var data = this.data;
     var el = this.el;
-    var lookAt = false;
     var numChildren = children.length;
     var positionFn;
     var positions;
@@ -53,17 +51,14 @@ module.exports.component = {
         break;
       }
       case 'cube': {
-        lookAt = true;
         positionFn = getCubePositions;
         break;
       }
       case 'dodecahedron': {
-        lookAt = true;
         positionFn = getDodecahedronPositions;
         break;
       }
       case 'pyramid': {
-        lookAt = true;
         positionFn = getPyramidPositions;
         break;
       }
@@ -75,10 +70,6 @@ module.exports.component = {
 
     positions = positionFn(data, numChildren, startPosition);
     setPositions(children, positions);
-
-    if (lookAt && data.lookAt) {
-      lookAt(children, data.lookAt);
-    }
   },
 
   /**
@@ -205,15 +196,6 @@ function getPyramidPositions (data, numChildren, startPosition) {
   ], startPosition, data.radius / 2);
 }
 module.exports.getPyramidPositions = getPyramidPositions;
-
-function lookAt (children, lookAtSelector) {
-  console.log(lookAtSelector);
-  var target3D = document.querySelector(lookAtSelector).object3D;
-  var helperVector = new THREE.Vector3();
-  children.forEach(function (child) {
-    child.object3D.lookAt(new THREE.Vector3().setFromMatrixPosition(target3D.matrixWorld));
-  });
-}
 
 /**
  * Multiply all coordinates by a scale factor and add translate.
