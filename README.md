@@ -1,5 +1,7 @@
 ## aframe-layout-component
 
+> Dependent on changes on A-Frame Core dev branch.
+
 3D layout component and helpers for A-Frame VR.
 
 ![](https://cloud.githubusercontent.com/assets/674727/11851982/662a8dee-a3ea-11e5-92cf-4b814e2c494d.png)
