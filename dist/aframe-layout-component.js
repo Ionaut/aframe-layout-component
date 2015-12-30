@@ -46,7 +46,7 @@
 
 	// Browser distrubution of the A-Frame component.
 	(function () {
-	  if (!AFRAME) {
+	  if (typeof AFRAME === undefined) {
 	    console.error('Component attempted to register before AFRAME was available.');
 	    return;
 	  }
@@ -72,13 +72,19 @@
 
 	/**
 	 * Layout component for A-Frame.
+	 * Some layouts adapted from http://www.vb-helper.com/tutorial_platonic_solids.html
 	 */
 	module.exports.component = {
 	  schema: {
-	    columns: { default: 1, min: 0, if: { type: ['box'] } },
-	    margin: { default: 1, min: 0, if: { type: ['box', 'line'] } },
-	    radius: { default: 1, min: 0, if: { type: ['circle'] } },
-	    type: { default: 'line', if: ['box', 'circle', 'line'] }
+	    columns: {default: 1, min: 0, if: {type: ['box']}},
+	    lookAt: {default: '[camera]', if: {type: ['cube', 'dodecahedron', 'pyramid']}},
+	    margin: {default: 1, min: 0, if: { type: ['box', 'line']}},
+	    radius: {default: 1, min: 0, if: {
+	      type: ['circle', 'cube', 'dodecahedron', 'pyramid']
+	    }},
+	    type: {default: 'line', oneOf: [
+	      'box', 'circle', 'cube', 'dodecahedron', 'line', 'pyramid'
+	    ]}
 	  },
 
 	  /**
@@ -102,11 +108,13 @@
 	    var children = this.children;
 	    var data = this.data;
 	    var el = this.el;
+	    var lookAt = false;
 	    var numChildren = children.length;
 	    var positionFn;
 	    var positions;
 	    var startPosition = el.getComputedAttribute('position');
 
+	    // Calculate different positions based on layout shape.
 	    switch (data.type) {
 	      case 'box': {
 	        positionFn = getBoxPositions;
@@ -116,13 +124,33 @@
 	        positionFn = getCirclePositions;
 	        break;
 	      }
+	      case 'cube': {
+	        lookAt = true;
+	        positionFn = getCubePositions;
+	        break;
+	      }
+	      case 'dodecahedron': {
+	        lookAt = true;
+	        positionFn = getDodecahedronPositions;
+	        break;
+	      }
+	      case 'pyramid': {
+	        lookAt = true;
+	        positionFn = getPyramidPositions;
+	        break;
+	      }
 	      default: {
+	        // Line.
 	        positionFn = getLinePositions;
 	      }
 	    }
 
 	    positions = positionFn(data, numChildren, startPosition);
 	    setPositions(children, positions);
+
+	    if (lookAt && data.lookAt) {
+	      lookAt(children, data.lookAt);
+	    }
 	  },
 
 	  /**
@@ -142,11 +170,11 @@
 
 	  for (var row = 0; row < rows; row++) {
 	    for (var column = 0; column < data.columns; column++) {
-	      positions.push({
-	        x: column * data.margin,
-	        y: row * data.margin,
-	        z: 0
-	      });
+	      positions.push([
+	        column * data.margin,
+	        row * data.margin,
+	        0
+	      ]);
 	    }
 	  }
 
@@ -163,11 +191,11 @@
 
 	  for (var i = 0; i < numChildren; i++) {
 	    var rad = i * (2 * Math.PI) / numChildren;
-	    positions.push({
-	      x: startPosition.x + data.radius * Math.cos(rad),
-	      y: startPosition.y,
-	      z: startPosition.z + data.radius * Math.sin(rad)
-	    });
+	    positions.push([
+	      startPosition.x + data.radius * Math.cos(rad),
+	      startPosition.y,
+	      startPosition.z + data.radius * Math.sin(rad)
+	    ]);
 	  }
 	  return positions;
 	}
@@ -184,6 +212,97 @@
 	module.exports.getLinePositions = getLinePositions;
 
 	/**
+	 * Get positions for `cube` layout.
+	 */
+	function getCubePositions (data, numChildren, startPosition) {
+	  return transform([
+	    [1, 0, 0],
+	    [0, 1, 0],
+	    [0, 0, 1],
+	    [-1, 0, 0],
+	    [0, -1, 0],
+	    [0, 0, -1],
+	  ], startPosition, data.radius / 2);
+	}
+	module.exports.getCubePositions = getCubePositions;
+
+	/**
+	 * Get positions for `dodecahedron` layout.
+	 */
+	function getDodecahedronPositions (data, numChildren, startPosition) {
+	  var PHI = (1 + Math.sqrt(5)) / 2;
+	  var B = 1 / PHI;
+	  var C = 2 - PHI;
+	  var NB = -1 * B;
+	  var NC = -1 * C;
+
+	  return transform([
+	    [-1, C, 0],
+	    [-1, NC, 0],
+	    [0, -1, C],
+	    [0, -1, NC],
+	    [0, 1, C],
+	    [0, 1, NC],
+	    [1, C, 0],
+	    [1, NC, 0],
+	    [B, B, B],
+	    [B, B, NB],
+	    [B, NB, B],
+	    [B, NB, NB],
+	    [C, 0, 1],
+	    [C, 0, -1],
+	    [NB, B, B],
+	    [NB, B, NB],
+	    [NB, NB, B],
+	    [NB, NB, NB],
+	    [NC, 0, 1],
+	    [NC, 0, -1],
+	  ], startPosition, data.radius / 2);
+	}
+	module.exports.getDodecahedronPositions = getDodecahedronPositions;
+
+	/**
+	 * Get positions for `pyramid` layout.
+	 */
+	function getPyramidPositions (data, numChildren, startPosition) {
+	  var SQRT_3 = Math.sqrt(3);
+	  var NEG_SQRT_1_3 = -1 / Math.sqrt(3);
+	  var DBL_SQRT_2_3 = 2 * Math.sqrt(2 / 3);
+
+	  return transform([
+	    [0, 0, SQRT_3 + NEG_SQRT_1_3],
+	    [-1, 0, NEG_SQRT_1_3],
+	    [1, 0, NEG_SQRT_1_3],
+	    [0, DBL_SQRT_2_3, 0]
+	  ], startPosition, data.radius / 2);
+	}
+	module.exports.getPyramidPositions = getPyramidPositions;
+
+	function lookAt (children, lookAtSelector) {
+	  console.log(lookAtSelector);
+	  var target3D = document.querySelector(lookAtSelector).object3D;
+	  var helperVector = new THREE.Vector3();
+	  children.forEach(function (child) {
+	    child.object3D.lookAt(new THREE.Vector3().setFromMatrixPosition(target3D.matrixWorld));
+	  });
+	}
+
+	/**
+	 * Multiply all coordinates by a scale factor and add translate.
+	 *
+	 * @params {array} positions - Array of coordinates in array form.
+	 * @returns {array} positions
+	 */
+	function transform (positions, translate, scale) {
+	  translate = [translate.x, translate.y, translate.z];
+	  return positions.map(function (position) {
+	    return position.map(function (point, i) {
+	      return point * scale + translate[i];
+	    });
+	  });
+	};
+
+	/**
 	 * Set position on child entities.
 	 *
 	 * @param {array} els - Child entities to set.
@@ -191,7 +310,12 @@
 	 */
 	function setPositions (els, positions) {
 	  els.forEach(function (el, i) {
-	    el.setAttribute('position', positions[i]);
+	    var position = positions[i];
+	    el.setAttribute('position', {
+	      x: position[0],
+	      y: position[1],
+	      z: position[2]
+	    });
 	  });
 	}
 

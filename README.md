@@ -6,7 +6,7 @@
 
 ### Usage
 
-Install.
+Install (or directly include the [browser files](dist)).
 
 ```bash
 npm install --save aframe-layout
@@ -38,8 +38,8 @@ This will layout all of the child entities in a circle.
 
 ### Attributes
 
-| Attribute | Description                                                                         | Default Value |
-| --------- | -----------                                                                         | ------------- |
-| type      | Type of layout. Can be one of `box`, `circle`, `cube`, `line`, `pyramid`, `sphere`. | `line`        |
-| margin    | Margin in meters.                                                                   | 1             |
-| radius    | Radius in meters.                                                                   | 1             |
+| Attribute | Description                                                                               | Default Value |
+| --------- | -----------                                                                               | ------------- |
+| type      | Type of layout. Can be one of `box`, `circle`, `cube`, `dodecahedron`, `line`, `pyramid`. | `line`        |
+| margin    | Margin in meters.                                                                         | 1             |
+| radius    | Radius in meters.                                                                         | 1             |

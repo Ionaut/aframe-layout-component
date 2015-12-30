@@ -1,6 +1,6 @@
 {
   "name": "aframe-layout",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "3D layout component and helpers for A-Frame VR.",
   "main": "index.js",
   "scripts": {

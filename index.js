@@ -1,13 +1,18 @@
 /**
  * Layout component for A-Frame.
- * http://www.vb-helper.com/tutorial_platonic_solids.html
+ * Some layouts adapted from http://www.vb-helper.com/tutorial_platonic_solids.html
  */
 module.exports.component = {
   schema: {
-    columns: { default: 1, min: 0, if: { type: ['box'] } },
-    margin: { default: 1, min: 0, if: { type: ['box', 'line'] } },
-    radius: { default: 1, min: 0, if: { type: ['circle', 'cube', 'pyramid'] } },
-    type: { default: 'line', oneOf: ['box', 'circle', 'cube', 'line', 'pyramid'] }
+    columns: {default: 1, min: 0, if: {type: ['box']}},
+    lookAt: {default: '[camera]', if: {type: ['cube', 'dodecahedron', 'pyramid']}},
+    margin: {default: 1, min: 0, if: { type: ['box', 'line']}},
+    radius: {default: 1, min: 0, if: {
+      type: ['circle', 'cube', 'dodecahedron', 'pyramid']
+    }},
+    type: {default: 'line', oneOf: [
+      'box', 'circle', 'cube', 'dodecahedron', 'line', 'pyramid'
+    ]}
   },
 
   /**
@@ -31,6 +36,7 @@ module.exports.component = {
     var children = this.children;
     var data = this.data;
     var el = this.el;
+    var lookAt = false;
     var numChildren = children.length;
     var positionFn;
     var positions;
@@ -47,10 +53,17 @@ module.exports.component = {
         break;
       }
       case 'cube': {
+        lookAt = true;
         positionFn = getCubePositions;
         break;
       }
+      case 'dodecahedron': {
+        lookAt = true;
+        positionFn = getDodecahedronPositions;
+        break;
+      }
       case 'pyramid': {
+        lookAt = true;
         positionFn = getPyramidPositions;
         break;
       }
@@ -62,6 +75,10 @@ module.exports.component = {
 
     positions = positionFn(data, numChildren, startPosition);
     setPositions(children, positions);
+
+    if (lookAt && data.lookAt) {
+      lookAt(children, data.lookAt);
+    }
   },
 
   /**
@@ -138,6 +155,41 @@ function getCubePositions (data, numChildren, startPosition) {
 module.exports.getCubePositions = getCubePositions;
 
 /**
+ * Get positions for `dodecahedron` layout.
+ */
+function getDodecahedronPositions (data, numChildren, startPosition) {
+  var PHI = (1 + Math.sqrt(5)) / 2;
+  var B = 1 / PHI;
+  var C = 2 - PHI;
+  var NB = -1 * B;
+  var NC = -1 * C;
+
+  return transform([
+    [-1, C, 0],
+    [-1, NC, 0],
+    [0, -1, C],
+    [0, -1, NC],
+    [0, 1, C],
+    [0, 1, NC],
+    [1, C, 0],
+    [1, NC, 0],
+    [B, B, B],
+    [B, B, NB],
+    [B, NB, B],
+    [B, NB, NB],
+    [C, 0, 1],
+    [C, 0, -1],
+    [NB, B, B],
+    [NB, B, NB],
+    [NB, NB, B],
+    [NB, NB, NB],
+    [NC, 0, 1],
+    [NC, 0, -1],
+  ], startPosition, data.radius / 2);
+}
+module.exports.getDodecahedronPositions = getDodecahedronPositions;
+
+/**
  * Get positions for `pyramid` layout.
  */
 function getPyramidPositions (data, numChildren, startPosition) {
@@ -153,6 +205,15 @@ function getPyramidPositions (data, numChildren, startPosition) {
   ], startPosition, data.radius / 2);
 }
 module.exports.getPyramidPositions = getPyramidPositions;
+
+function lookAt (children, lookAtSelector) {
+  console.log(lookAtSelector);
+  var target3D = document.querySelector(lookAtSelector).object3D;
+  var helperVector = new THREE.Vector3();
+  children.forEach(function (child) {
+    child.object3D.lookAt(new THREE.Vector3().setFromMatrixPosition(target3D.matrixWorld));
+  });
+}
 
 /**
  * Multiply all coordinates by a scale factor and add translate.
