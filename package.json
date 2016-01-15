@@ -5,12 +5,11 @@
   "main": "index.js",
   "scripts": {
     "build": "browserify examples/main.js -o examples/build.js",
-    "dev": "watchify examples/main.js -o examples/build.js",
-    "dist": "webpack browser.js dist/aframe-layout-component.js && webpack -p browser.js dist/aframe-layout-component.min.js",
+    "dev": "budo examples/main.js:build.js --dir examples --port 8000 --live --open",
+    "dist": "webpack browser.js dist/aframe-example-component.js && webpack -p browser.js dist/aframe-example-component.min.js",
     "postpublish": "npm run dist",
     "preghpages": "npm run build && rm -rf gh-pages && cp -r examples gh-pages",
     "ghpages": "npm run preghpages && ghpages -p gh-pages",
-    "gh-pages": "npm run ghpages",
     "test": "karma start ./tests/karma.conf.js"
   },
   "repository": {
@@ -34,9 +33,10 @@
   },
   "homepage": "https://github.com/ngokevin/aframe-layout-component#readme",
   "devDependencies": {
-    "aframe-core": "*",
+    "aframe": "aframevr/aframe#a592a96",
     "browserify": "^12.0.1",
     "browserify-css": "^0.8.3",
+    "budo": "^7.1.0",
     "chai": "^3.4.1",
     "chai-shallow-deep-equal": "^1.3.0",
     "ghpages": "0.0.3",
@@ -48,7 +48,6 @@
     "karma-mocha-reporter": "^1.1.3",
     "karma-sinon-chai": "^1.1.0",
     "mocha": "^2.3.4",
-    "watchify": "^3.6.1",
     "webpack": "^1.12.9"
   }
 }

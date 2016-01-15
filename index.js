@@ -2,7 +2,7 @@
  * Layout component for A-Frame.
  * Some layouts adapted from http://www.vb-helper.com/tutorial_platonic_solids.html
  */
-module.exports.component = {
+module.exports.Component = {
   schema: {
     columns: {default: 1, min: 0, if: {type: ['box']}},
     margin: {default: 1, min: 0, if: { type: ['box', 'line']}},
