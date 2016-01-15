@@ -7,7 +7,7 @@
 
   // Register all components here.
   var components = {
-    layout: require('./index').component
+    layout: require('./index').Component
   };
 
   Object.keys(components).forEach(function (name) {

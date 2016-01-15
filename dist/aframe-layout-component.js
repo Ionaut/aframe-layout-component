@@ -53,7 +53,7 @@
 
 	  // Register all components here.
 	  var components = {
-	    layout: __webpack_require__(1).component
+	    layout: __webpack_require__(1).Component
 	  };
 
 	  Object.keys(components).forEach(function (name) {
