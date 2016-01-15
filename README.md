@@ -1,6 +1,6 @@
 ## aframe-layout-component
 
-> Dependent on changes on A-Frame Core dev branch.
+> Depends on [aframe#dev](https://github.com/aframevr/aframe/tree/dev) branch.
 
 3D layout component and helpers for A-Frame VR.
 
@@ -17,8 +17,9 @@ npm install --save aframe-layout
 Register.
 
 ```js
-var layout = require('aframe-layout').component;
-require('aframe-core').registerComponent('layout', layout);
+require('aframe');
+var layout = require('aframe-layout').Component;
+AFRAME.registerComponent('layout', layout);
 ```
 
 Use.

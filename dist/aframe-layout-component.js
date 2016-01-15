@@ -80,7 +80,7 @@
 	 * Layout component for A-Frame.
 	 * Some layouts adapted from http://www.vb-helper.com/tutorial_platonic_solids.html
 	 */
-	module.exports.component = {
+	module.exports.Component = {
 	  schema: {
 	    columns: {default: 1, min: 0, if: {type: ['box']}},
 	    margin: {default: 1, min: 0, if: { type: ['box', 'line']}},
@@ -96,14 +96,16 @@
 	   * Store initial positions in case need to reset on component removal.
 	   */
 	  init: function () {
-	    var self = this;
-	    var el = self.el;
-	    self.children = el.getChildEntities();
-	    self.initialPositions = [];
+	    var el = this.el;
+	    this.children = el.getChildEntities();
+	    var initialPositions = initialPositions = [];
 
-	    self.children.forEach(function (childEl) {
-	      self.initialPositions.push(childEl.getComputedAttribute('position'));
+	    this.children.forEach(function (childEl) {
+	      initialPositions.push(childEl.getComputedAttribute('position'));
 	    });
+
+	    this.childAttachedCallback = this.update.bind(this);
+	    el.addEventListener('child-attached', this.childAttachedCallback);
 	  },
 
 	  /**
@@ -154,6 +156,7 @@
 	   * Reset positions.
 	   */
 	  remove: function () {
+	    el.removeEventListener('child-attached', this.childAttachedCallback);
 	    setPositions(children, this.initialPositions);
 	  }
 	};
