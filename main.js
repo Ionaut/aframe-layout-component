@@ -1,3 +1,3 @@
-var layout = require('../index.js').component;
-var registerComponent = require('aframe-core').registerComponent;
-registerComponent('layout', layout);
+var AFRAME = require('aframe');
+var Layout = require('../index.js').Component;
+AFRAME.registerComponent('layout', Layout);
