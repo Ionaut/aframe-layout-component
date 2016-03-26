@@ -2,7 +2,7 @@
  * Layout component for A-Frame.
  * Some layouts adapted from http://www.vb-helper.com/tutorial_platonic_solids.html
  */
-module.exports.Component = {
+AFRAME.registerComponent('layout', {
   schema: {
     columns: {default: 1, min: 0, if: {type: ['box']}},
     margin: {default: 1, min: 0, if: { type: ['box', 'line']}},
@@ -81,7 +81,7 @@ module.exports.Component = {
     el.removeEventListener('child-attached', this.childAttachedCallback);
     setPositions(children, this.initialPositions);
   }
-};
+});
 
 /**
  * Get positions for `box` layout.
