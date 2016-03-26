@@ -42,45 +42,13 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// Browser distrubution of the A-Frame component.
-	(function () {
-	  if (typeof AFRAME === 'undefined' && typeof aframeCore === 'undefined') {
-	    console.error('Component attempted to register before AFRAME was available.');
-	    return;
-	  }
-
-	  // Register all components here.
-	  var components = {
-	    layout: __webpack_require__(1).Component
-	  };
-
-	  Object.keys(components).forEach(function (name) {
-	    if (typeof AFRAME !== 'undefined') {
-	      if (AFRAME.aframeCore) {
-	        AFRAME.aframeCore.registerComponent(name, components[name]);
-	      } else {
-	        AFRAME.registerComponent(name, components[name]);
-	      }
-	      return;
-	    }
-	    if (typeof aframeCore !== 'undefined') {
-	      aframeCore.registerComponent(name, components[name]);
-	    }
-	  });
-	})();
-
-
-/***/ },
-/* 1 */
 /***/ function(module, exports) {
 
 	/**
 	 * Layout component for A-Frame.
 	 * Some layouts adapted from http://www.vb-helper.com/tutorial_platonic_solids.html
 	 */
-	module.exports.Component = {
+	AFRAME.registerComponent('layout', {
 	  schema: {
 	    columns: {default: 1, min: 0, if: {type: ['box']}},
 	    margin: {default: 1, min: 0, if: { type: ['box', 'line']}},
@@ -159,7 +127,7 @@
 	    el.removeEventListener('child-attached', this.childAttachedCallback);
 	    setPositions(children, this.initialPositions);
 	  }
-	};
+	});
 
 	/**
 	 * Get positions for `box` layout.
