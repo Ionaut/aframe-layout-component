@@ -1,7 +1,5 @@
 ## aframe-layout-component
 
-> Depends on [aframe#dev](https://github.com/aframevr/aframe/tree/dev) branch.
-
 3D layout component and helpers for A-Frame VR.
 
 ![](https://cloud.githubusercontent.com/assets/674727/11851982/662a8dee-a3ea-11e5-92cf-4b814e2c494d.png)
