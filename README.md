@@ -38,7 +38,6 @@ Install and use by directly including the [browser files](dist):
       <a-entity geometry="primitive: box" material></a-entity>
     </a-entity>
   </a-scene>
-```
 </body>
 ```
 
